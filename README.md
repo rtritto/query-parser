@@ -5,6 +5,28 @@
 ## Example
 
 ```javascript
+var parse = require('mongodb-query-parser');
+var query = '{_id: ObjectId("58c33a794d08b991e3648fd2")}';
+
+// What is this highlighting/language mode for this string?
+parse.detect(query);
+
+// >>> `javascript`
+
+// Turn some JS code as a string into a real JS object safely and with no bson type loss.
+var EJSON = require('mongodb-extended-json');
+var queryAsAnObjectWithTypes = parse(query);
+
+EJSON.stringify(queryAsAnObjectWithTypes);
+// >>> '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}'
+
+var queryAsJSON = '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}';
+parse.detect(queryAsJSON);
+// >>> `json`
+
+// Turn it into a JS string that looks pretty in codemirror:
+parse.toJavascriptString(parse(queryAsJSON));
+// >>> '{_id:ObjectId(\'58c33a794d08b991e3648fd2\')}'
 ```
 
 ## License

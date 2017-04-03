@@ -20,6 +20,7 @@
     "bson": "^1.0.4",
     "context-eval": "^0.1.0",
     "debug": "^2.6.3",
+    "is-json": "^2.0.1",
     "javascript-stringify": "^1.6.0",
     "mongodb-extended-json": "^1.9.0"
   },

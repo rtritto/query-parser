@@ -87,7 +87,7 @@ describe('mongodb-query-parser', function() {
       it('should work', function() {
         var res = parse('{_id: ObjectId("58c33a794d08b991e3648fd2")}');
         var stringified = parse.toJavascriptString(res);
-        debug('stringified', { res: res, stringified: stringified });
+        assert.equal(stringified, "{_id:ObjectId('58c33a794d08b991e3648fd2')}");
       });
     });
   });
