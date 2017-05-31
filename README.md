@@ -17,6 +17,7 @@ parse.detect(query);
 var EJSON = require('mongodb-extended-json');
 var queryAsAnObjectWithTypes = parse(query);
 
+// Use extended json to prove types are intact
 EJSON.stringify(queryAsAnObjectWithTypes);
 // >>> '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}'
 
