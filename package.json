@@ -22,7 +22,10 @@
     "debug": "^2.6.3",
     "is-json": "^2.0.1",
     "javascript-stringify": "^1.6.0",
-    "mongodb-extended-json": "^1.9.0"
+    "lodash": "^4.17.4",
+    "lru-cache": "^4.1.1",
+    "mongodb-extended-json": "^1.9.0",
+    "mongodb-language-model": "^1.1.0"
   },
   "devDependencies": {
     "eslint-config-mongodb-js": "^2.2.0",
