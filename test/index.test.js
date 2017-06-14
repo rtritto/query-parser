@@ -90,7 +90,7 @@ describe('mongodb-query-parser', function() {
         '{_id: ObjectId("58c33a794d08b991e3648fd2")}'
       );
       var stringified = parser.stringify(res);
-      assert.equal(stringified, "{_id:ObjectId('58c33a794d08b991e3648fd2')}");
+      assert.equal(stringified, "{_id: ObjectId('58c33a794d08b991e3648fd2')}");
     });
   });
 
