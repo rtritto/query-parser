@@ -92,6 +92,12 @@ describe('mongodb-query-parser', function() {
       var stringified = parser.stringify(res);
       assert.equal(stringified, "{_id: ObjectId('58c33a794d08b991e3648fd2')}");
     });
+    it('should not added extra space when nesting', function() {
+      assert.equal(
+        parser.stringify({ a: { $exists: true } }),
+        '{a: {$exists: true}}'
+      );
+    });
   });
 
   describe('project', function() {
