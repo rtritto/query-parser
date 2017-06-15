@@ -132,4 +132,22 @@ describe('mongodb-query-parser', function() {
       assert.equal(parser.isSortValid('{grabage'), false);
     });
   });
+
+  describe('skip', function() {
+    it('should work', function() {
+      assert.equal(parser.isSkipValid('{skip: "a"}'), false);
+      assert.equal(parser.isSkipValid('0'), 0);
+      assert.equal(parser.isSkipValid(1), 1);
+      assert.equal(parser.isSkipValid('   '), parser.DEFAULT_SKIP);
+    });
+  });
+
+  describe('limit', function() {
+    it('should work', function() {
+      assert.equal(parser.isLimitValid('{limit: "a"}'), false);
+      assert.equal(parser.isLimitValid('0'), 0);
+      assert.equal(parser.isLimitValid(1), 1);
+      assert.equal(parser.isLimitValid('   '), parser.DEFAULT_LIMIT);
+    });
+  });
 });
