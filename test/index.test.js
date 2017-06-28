@@ -14,12 +14,25 @@ function convert(string) {
 
 describe('mongodb-query-parser', function() {
   describe('filter', function() {
-    it('should work', function() {
-      var res = parser.parseFilter(
-        '{_id: ObjectId("58c33a794d08b991e3648fd2")}'
-      );
-      assert.deepEqual(res, {
-        _id: new bson.ObjectId('58c33a794d08b991e3648fd2')
+    context('when no new keyword is provided', function() {
+      it('returns the filter', function() {
+        var res = parser.parseFilter(
+          '{_id: ObjectId("58c33a794d08b991e3648fd2")}'
+        );
+        assert.deepEqual(res, {
+          _id: new bson.ObjectId('58c33a794d08b991e3648fd2')
+        });
+      });
+    });
+
+    context('when a new keyword is provided', function() {
+      it('returns the filter', function() {
+        var res = parser.parseFilter(
+          '{_id: new ObjectId("58c33a794d08b991e3648fd2")}'
+        );
+        assert.deepEqual(res, {
+          _id: new bson.ObjectId('58c33a794d08b991e3648fd2')
+        });
       });
     });
 
@@ -30,8 +43,20 @@ describe('mongodb-query-parser', function() {
         });
       });
 
+      it('should support new Date', function() {
+        assert.deepEqual(convert('new Date("2017-01-01T12:35:31.000Z")'), {
+          $date: '2017-01-01T12:35:31.000Z'
+        });
+      });
+
       it('should support ISODate', function() {
         assert.deepEqual(convert('ISODate("2017-01-01T12:35:31.000Z")'), {
+          $date: '2017-01-01T12:35:31.000Z'
+        });
+      });
+
+      it('should support new ISODate', function() {
+        assert.deepEqual(convert('new ISODate("2017-01-01T12:35:31.000Z")'), {
           $date: '2017-01-01T12:35:31.000Z'
         });
       });
@@ -42,20 +67,41 @@ describe('mongodb-query-parser', function() {
         });
       });
 
+      it('should support new Timestamp', function() {
+        assert.deepEqual(convert('new Timestamp(15, 31)'), {
+          $timestamp: { t: 15, i: 31 }
+        });
+      });
+
       it('should support inline regex', function() {
         assert.deepEqual(convert('/some.*regex+/i'), {
           $regex: 'some.*regex+',
           $options: 'i'
         });
       });
+
       it('should support RegExp', function() {
+        assert.deepEqual(convert("RegExp('some.*regex+', 'i')"), {
+          $regex: 'some.*regex+',
+          $options: 'i'
+        });
+      });
+
+      it('should support new RegExp', function() {
         assert.deepEqual(convert("new RegExp('some.*regex+', 'i')"), {
           $regex: 'some.*regex+',
           $options: 'i'
         });
       });
+
       it('should support ObjectId', function() {
         assert.deepEqual(convert('ObjectId("58c33a794d08b991e3648fd2")'), {
+          $oid: '58c33a794d08b991e3648fd2'
+        });
+      });
+
+      it('should support new ObjectId', function() {
+        assert.deepEqual(convert('new ObjectId("58c33a794d08b991e3648fd2")'), {
           $oid: '58c33a794d08b991e3648fd2'
         });
       });
@@ -65,8 +111,21 @@ describe('mongodb-query-parser', function() {
           $oid: '58c33a794d08b991e3648fd2'
         });
       });
+
+      it('should support new ObjectID', function() {
+        assert.deepEqual(convert('new ObjectID("58c33a794d08b991e3648fd2")'), {
+          $oid: '58c33a794d08b991e3648fd2'
+        });
+      });
+
       it('should support NumberLong', function() {
         assert.deepEqual(convert('NumberLong("1234567890")'), {
+          $numberLong: '1234567890'
+        });
+      });
+
+      it('should support new NumberLong', function() {
+        assert.deepEqual(convert('new NumberLong("1234567890")'), {
           $numberLong: '1234567890'
         });
       });
@@ -76,14 +135,23 @@ describe('mongodb-query-parser', function() {
           $numberDecimal: '10.99'
         });
       });
+
+      it('should support new NumberDecimal', function() {
+        assert.deepEqual(convert('new NumberDecimal("10.99")'), {
+          $numberDecimal: '10.99'
+        });
+      });
+
       it('should support MixKey', function() {
         assert.deepEqual(convert('MinKey()'), { $minKey: 1 });
       });
+
       it('should support MaxKey', function() {
         assert.deepEqual(convert('MaxKey()'), { $maxKey: 1 });
       });
     });
   });
+
   describe('stringify', function() {
     it('should work', function() {
       var res = parser.parseFilter(
