@@ -166,6 +166,20 @@ describe('mongodb-query-parser', function() {
         '{a: {$exists: true}}'
       );
     });
+
+    context('when providing a long', function() {
+      it('correctly converts to NumberLong', function() {
+        var stringified = parser.stringify({ test: bson.Long.fromNumber(5) });
+        assert.equal(stringified, '{test: NumberLong(5)}');
+      });
+    });
+
+    context('when providing a decimal128', function() {
+      it('correctly converts to NumberDecimal', function() {
+        var stringified = parser.stringify({ test: bson.Decimal128.fromString('5.5') });
+        assert.equal(stringified, "{test: NumberDecimal('5.5')}");
+      });
+    });
   });
 
   describe('project', function() {
