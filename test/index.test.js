@@ -152,6 +152,17 @@ describe('mongodb-query-parser', function() {
     });
   });
 
+  describe('isFilterValid', function() {
+    context('when the string contains a NumberLong', function() {
+      const query = '{value: NumberLong(1)}';
+      const parsed = parser.isFilterValid(query);
+      it('returns the bson long value', function() {
+        console.log(parsed.value.getLowBits());
+        assert.equal(parsed.value.toNumber(), 1);
+      });
+    });
+  });
+
   describe('stringify', function() {
     it('should work', function() {
       var res = parser.parseFilter(
