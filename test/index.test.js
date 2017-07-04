@@ -180,6 +180,21 @@ describe('mongodb-query-parser', function() {
         assert.equal(stringified, "{test: NumberDecimal('5.5')}");
       });
     });
+
+    context('when providing a geo query', function() {
+      const query = {
+        coordinates: {
+          '$geoWithin': {
+            '$centerSphere': [[ -79, 28 ], 0.04 ]
+          }
+        }
+      };
+
+      it('correctly replaces nested tabs with single spaces', function() {
+        var stringified = parser.stringify(query);
+        assert.equal(stringified, '{coordinates: {$geoWithin: { $centerSphere: [ [ -79, 28 ], 0.04 ]}}}');
+      });
+    });
   });
 
   describe('project', function() {
