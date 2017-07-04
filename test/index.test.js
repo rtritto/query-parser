@@ -157,7 +157,6 @@ describe('mongodb-query-parser', function() {
       const query = '{value: NumberLong(1)}';
       const parsed = parser.isFilterValid(query);
       it('returns the bson long value', function() {
-        console.log(parsed.value.getLowBits());
         assert.equal(parsed.value.toNumber(), 1);
       });
     });
