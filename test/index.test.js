@@ -37,6 +37,13 @@ describe('mongodb-query-parser', function() {
     });
 
     describe('shell helpers', function() {
+      it('should support Code', function() {
+        assert.deepEqual(convert('Code("return true", {})'), {
+          $code: 'return true',
+          $scope: {}
+        });
+      });
+
       it('should support Date', function() {
         assert.deepEqual(convert('Date("2017-01-01T12:35:31.000Z")'), {
           $date: '2017-01-01T12:35:31.000Z'

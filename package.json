@@ -24,7 +24,7 @@
     "javascript-stringify": "^1.6.0",
     "lodash": "^4.17.4",
     "lru-cache": "^4.1.1",
-    "mongodb-extended-json": "^1.9.0",
+    "mongodb-extended-json": "^1.10.0",
     "mongodb-language-model": "^1.1.0",
     "ms": "^2.0.0"
   },
