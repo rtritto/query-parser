@@ -44,6 +44,12 @@ describe('mongodb-query-parser', function() {
         });
       });
 
+      it('should support BSONDate', function() {
+        assert.deepEqual(convert('BSONDate("2017-01-01T12:35:31.000Z")'), {
+          $date: '2017-01-01T12:35:31.000Z'
+        });
+      });
+
       it('should support Date', function() {
         assert.deepEqual(convert('Date("2017-01-01T12:35:31.000Z")'), {
           $date: '2017-01-01T12:35:31.000Z'
