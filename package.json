@@ -8,13 +8,13 @@
     "test": "mocha",
     "ci": "npm run check && npm test"
   },
-  "homepage": "http://github.com/mongodb-js/mongodb-query-parser",
+  "homepage": "https://github.com/mongodb-js/query-parser",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mongodb-js/mongodb-query-parser.git"
+    "url": "git://github.com/mongodb-js/query-parser.git"
   },
   "bugs": {
-    "url": "git://github.com/mongodb-js/mongodb-query-parser.git/issues"
+    "url": "https://github.com/mongodb-js/query-parser/issues"
   },
   "dependencies": {
     "bson": "^1.0.4",
