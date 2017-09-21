@@ -44,12 +44,6 @@ describe('mongodb-query-parser', function() {
         });
       });
 
-      it('should support BSONDate', function() {
-        assert.deepEqual(convert('BSONDate("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31.000Z'
-        });
-      });
-
       it('should support Date', function() {
         assert.deepEqual(convert('Date("2017-01-01T12:35:31.000Z")'), {
           $date: '2017-01-01T12:35:31.000Z'
@@ -216,6 +210,22 @@ describe('mongodb-query-parser', function() {
       it('correctly replaces nested tabs with single spaces', function() {
         var stringified = parser.stringify(query);
         assert.equal(stringified, '{coordinates: {$geoWithin: { $centerSphere: [ [ -79, 28 ], 0.04 ]}}}');
+      });
+    });
+
+    context('when providing a Date', function() {
+      it('correctly converts to an ISODate', function() {
+        var res = parser.parseFilter("{test: Date('2017-01-01T12:35:31.000Z')}");
+        var stringified = parser.stringify(res);
+        assert.equal(stringified, "{test: ISODate('2017-01-01T12:35:31.000Z')}");
+      });
+    });
+
+    context('when providing an ISODate', function() {
+      it('correctly converts to an ISODate', function() {
+        var res = parser.parseFilter("{test: ISODate('2017-01-01T12:35:31.000Z')}");
+        var stringified = parser.stringify(res);
+        assert.equal(stringified, "{test: ISODate('2017-01-01T12:35:31.000Z')}");
       });
     });
   });
