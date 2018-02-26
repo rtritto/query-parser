@@ -137,6 +137,14 @@ describe('mongodb-query-parser', function() {
         });
       });
 
+      it('should support NumberInt', function() {
+        assert.deepEqual(convert('NumberInt("1234567890")'), 1234567890);
+      });
+
+      it('should support NumberInt with number', function() {
+        assert.deepEqual(convert('NumberInt(1234567890)'), 1234567890);
+      });
+
       it('should support NumberDecimal', function() {
         assert.deepEqual(convert('NumberDecimal("10.99")'), {
           $numberDecimal: '10.99'
