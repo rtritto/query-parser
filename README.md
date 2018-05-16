@@ -1,33 +1,49 @@
 # mongodb-query-parser [![travis][travis_img]][travis_url] [![npm][npm_img]][npm_url]
 
-> Parse MongoDB queries
+> Safe parsing and validation for MongoDB queries (filters), projections, and more.
 
 ## Example
 
+Turn some JS code as a string into a real JS object safely and with no bson type loss:
+
 ```javascript
-var parse = require('mongodb-query-parser');
+require('mongodb-query-parser')('{_id: ObjectId("58c33a794d08b991e3648fd2")}');
+// >>> {_id: ObjectId('58c33a794d08b991e3648fd2'x)}
+```
+
+### Usage with codemirror
+
+```javascript
+var parser = require('mongodb-query-parser');
 var query = '{_id: ObjectId("58c33a794d08b991e3648fd2")}';
-
 // What is this highlighting/language mode for this string?
-parse.detect(query);
-
+parser.detect(query);
 // >>> `javascript`
 
-// Turn some JS code as a string into a real JS object safely and with no bson type loss.
+var queryAsJSON = '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}';
+// What is this highlighting/language mode for this string?
+parser.detect(queryAsJSON);
+// >>> `json`
+
+// Turn it into a JS string that looks pretty in codemirror:
+parser.toJavascriptString(parse(query));
+// >>> '{_id:ObjectId(\'58c33a794d08b991e3648fd2\')}'
+```
+
+### Extended JSON Support
+
+```javascript
+var parser = require('mongodb-query-parser');
 var EJSON = require('mongodb-extended-json');
-var queryAsAnObjectWithTypes = parse(query);
+var queryAsAnObjectWithTypes = parser.parseFilter(query);
 
 // Use extended json to prove types are intact
 EJSON.stringify(queryAsAnObjectWithTypes);
 // >>> '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}'
 
 var queryAsJSON = '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}';
-parse.detect(queryAsJSON);
+parser.detect(queryAsJSON);
 // >>> `json`
-
-// Turn it into a JS string that looks pretty in codemirror:
-parse.toJavascriptString(parse(queryAsJSON));
-// >>> '{_id:ObjectId(\'58c33a794d08b991e3648fd2\')}'
 ```
 
 ## License
