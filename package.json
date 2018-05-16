@@ -17,9 +17,9 @@
     "url": "https://github.com/mongodb-js/query-parser/issues"
   },
   "dependencies": {
-    "bson": "^1.0.4",
+    "bson": "^2.0.6",
     "context-eval": "^0.1.0",
-    "debug": "^2.6.3",
+    "debug": "^3.1.0",
     "is-json": "^2.0.1",
     "javascript-stringify": "^1.6.0",
     "lodash": "^4.17.4",
@@ -29,10 +29,10 @@
     "ms": "^2.0.0"
   },
   "devDependencies": {
-    "eslint-config-mongodb-js": "^2.2.0",
-    "mocha": "^2.3.4",
+    "eslint-config-mongodb-js": "^3.0.1",
+    "mocha": "^5.1.1",
     "mongodb-js-fmt": "^0.0.3",
-    "mongodb-js-precommit": "^0.2.8",
+    "mongodb-js-precommit": "^1.0.1",
     "pre-commit": "^1.1.2"
   },
   "license": "Apache-2.0",
