@@ -201,7 +201,9 @@ describe('mongodb-query-parser', function() {
 
     context('when providing a decimal128', function() {
       it('correctly converts to NumberDecimal', function() {
-        var stringified = parser.stringify({ test: bson.Decimal128.fromString('5.5') });
+        var stringified = parser.stringify({
+          test: bson.Decimal128.fromString('5.5')
+        });
         assert.equal(stringified, "{test: NumberDecimal('5.5')}");
       });
     });
@@ -209,31 +211,44 @@ describe('mongodb-query-parser', function() {
     context('when providing a geo query', function() {
       const query = {
         coordinates: {
-          '$geoWithin': {
-            '$centerSphere': [[ -79, 28 ], 0.04 ]
+          $geoWithin: {
+            $centerSphere: [[-79, 28], 0.04]
           }
         }
       };
 
       it('correctly replaces nested tabs with single spaces', function() {
         var stringified = parser.stringify(query);
-        assert.equal(stringified, '{coordinates: {$geoWithin: { $centerSphere: [ [ -79, 28 ], 0.04 ]}}}');
+        assert.equal(
+          stringified,
+          '{coordinates: {$geoWithin: { $centerSphere: [ [ -79, 28 ], 0.04 ]}}}'
+        );
       });
     });
 
     context('when providing a Date', function() {
       it('correctly converts to an ISODate', function() {
-        var res = parser.parseFilter("{test: Date('2017-01-01T12:35:31.000Z')}");
+        var res = parser.parseFilter(
+          "{test: Date('2017-01-01T12:35:31.000Z')}"
+        );
         var stringified = parser.stringify(res);
-        assert.equal(stringified, "{test: ISODate('2017-01-01T12:35:31.000Z')}");
+        assert.equal(
+          stringified,
+          "{test: ISODate('2017-01-01T12:35:31.000Z')}"
+        );
       });
     });
 
     context('when providing an ISODate', function() {
       it('correctly converts to an ISODate', function() {
-        var res = parser.parseFilter("{test: ISODate('2017-01-01T12:35:31.000Z')}");
+        var res = parser.parseFilter(
+          "{test: ISODate('2017-01-01T12:35:31.000Z')}"
+        );
         var stringified = parser.stringify(res);
-        assert.equal(stringified, "{test: ISODate('2017-01-01T12:35:31.000Z')}");
+        assert.equal(
+          stringified,
+          "{test: ISODate('2017-01-01T12:35:31.000Z')}"
+        );
       });
     });
   });
