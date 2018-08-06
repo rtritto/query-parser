@@ -270,6 +270,25 @@ describe('mongodb-query-parser', function() {
     });
   });
 
+  describe('collation', function() {
+    it('should default to null', function() {
+      assert.equal(parser.parseCollation(''), null);
+      assert.equal(parser.parseCollation('      '), null);
+      assert.equal(parser.parseCollation('{}'), null);
+    });
+    it('should parse valid collation strings', function() {
+      assert.deepEqual(parser.parseCollation('{locale: "simple"}'), { locale: 'simple' });
+      assert.deepEqual(
+        parser.parseCollation('{locale: "en_US", strength: 1}'), { locale: 'en_US', strength: 1 }
+      );
+    });
+    it('should detect invalid project strings', function() {
+      assert.equal(parser.isCollationValid('{invalid: "simple"}'), false);
+      assert.equal(parser.isCollationValid('{locale: ""}'), false);
+      assert.equal(parser.isCollationValid('{locale: "invalid"}'), false);
+    });
+  });
+
   describe('sort', function() {
     it('should default to null', function() {
       assert.equal(parser.parseSort(''), null);
