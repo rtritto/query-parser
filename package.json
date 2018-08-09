@@ -33,7 +33,8 @@
     "mocha": "^5.1.1",
     "mongodb-js-fmt": "^0.0.3",
     "mongodb-js-precommit": "^1.0.1",
-    "pre-commit": "^1.1.2"
+    "pre-commit": "^1.1.2",
+    "sinon": "^6.1.4"
   },
   "license": "Apache-2.0",
   "precommit": [

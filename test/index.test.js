@@ -1,5 +1,6 @@
 var parser = require('../');
 var assert = require('assert');
+var sinon = require('sinon');
 
 var EJSON = require('mongodb-extended-json');
 var bson = require('bson');
@@ -65,6 +66,45 @@ describe('mongodb-query-parser', function() {
       it('should support new ISODate', function() {
         assert.deepEqual(convert('new ISODate("2017-01-01T12:35:31.000Z")'), {
           $date: '2017-01-01T12:35:31.000Z'
+        });
+      });
+
+      context('for Date() and ISODate() without argument', function() {
+        // mock a specific timestamp with sinon.useFakeTimers
+        var now = 1533789516225;
+        var nowStr = '2018-08-09T04:38:36.225Z';
+        var clock;
+
+        beforeEach(function() {
+          clock = sinon.useFakeTimers(now);
+        });
+
+        afterEach(function() {
+          clock.restore();
+        });
+
+        it('should support Date', function() {
+          assert.deepEqual(convert('Date()'), {
+            $date: nowStr
+          });
+        });
+
+        it('should support new Date', function() {
+          assert.deepEqual(convert('new Date()'), {
+            $date: nowStr
+          });
+        });
+
+        it('should support ISODate', function() {
+          assert.deepEqual(convert('ISODate()'), {
+            $date: nowStr
+          });
+        });
+
+        it('should support new ISODate', function() {
+          assert.deepEqual(convert('new ISODate()'), {
+            $date: nowStr
+          });
         });
       });
 
