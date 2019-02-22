@@ -302,6 +302,7 @@ describe('mongodb-query-parser', function() {
     it('should parse valid project strings', function() {
       assert.deepEqual(parser.parseProject('{_id: 1}'), { _id: 1 });
       assert.deepEqual(parser.parseProject('{_id: -1}'), { _id: -1 });
+      assert.deepEqual(parser.parseProject('{comments: { $slice: -1 }}'), { comments: { $slice: -1 }});
     });
     it('should detect invalid project strings', function() {
       assert.equal(parser.isProjectValid('{_id: "a"}'), false);
