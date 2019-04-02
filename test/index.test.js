@@ -363,4 +363,13 @@ describe('mongodb-query-parser', function() {
       assert.equal(parser.isLimitValid('   '), parser.DEFAULT_LIMIT);
     });
   });
+
+  describe('maxTimeMS', function() {
+    it('Validates as a number', function() {
+      assert.equal(parser.isMaxTimeMSValid('{maxTimeMS: "a"}'), false);
+      assert.equal(parser.isMaxTimeMSValid('0'), 0);
+      assert.equal(parser.isMaxTimeMSValid(1), 1);
+      assert.equal(parser.isMaxTimeMSValid('   '), parser.DEFAULT_MAX_TIME_MS);
+    });
+  });
 });
