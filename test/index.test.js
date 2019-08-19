@@ -69,6 +69,20 @@ describe('mongodb-query-parser', function() {
         });
       });
 
+      it('should support BinData', function() {
+        assert.deepEqual(convert('new BinData(2, "OyQRAeK7QlWMr0E2xWapYg==")'), {
+          $binary: 'T3lRUkFlSzdRbFdNcjBFMnhXYXBZZz09',
+          $type: '2'
+        });
+      });
+
+      it('should support UUID', function() {
+        assert.deepEqual(convert('UUID("3b241101-e2bb-4255-8caf-4136c566a962")'), {
+          $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
+          $type: '4'
+        });
+      });
+
       context('for Date() and ISODate() without argument', function() {
         // mock a specific timestamp with sinon.useFakeTimers
         var now = 1533789516225;
