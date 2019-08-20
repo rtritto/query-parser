@@ -71,7 +71,7 @@ describe('mongodb-query-parser', function() {
 
       it('should support BinData', function() {
         assert.deepEqual(convert('new BinData(2, "OyQRAeK7QlWMr0E2xWapYg==")'), {
-          $binary: 'T3lRUkFlSzdRbFdNcjBFMnhXYXBZZz09',
+          $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
           $type: '2'
         });
       });
