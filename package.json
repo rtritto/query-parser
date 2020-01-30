@@ -23,7 +23,7 @@
     "lodash": "^4.17.15",
     "lru-cache": "^5.1.1",
     "mongodb-extended-json": "^1.10.2",
-    "mongodb-language-model": "^1.6.0",
+    "mongodb-language-model": "^1.6.1",
     "ms": "^2.1.2"
   },
   "devDependencies": {
