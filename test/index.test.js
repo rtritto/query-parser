@@ -240,7 +240,7 @@ describe('mongodb-query-parser', function() {
     context('when turning off validation', function() {
       context('when the query is a valid object', function() {
         const query = '{value: NumberLong(1)}';
-        const parsed = parser.isFilterValid(query);
+        const parsed = parser.isFilterValid(query, { validate: false });
 
         it('returns truthy', function() {
           assert.equal(parsed.value.toNumber(), 1);
@@ -249,7 +249,7 @@ describe('mongodb-query-parser', function() {
 
       context('when the query is not a valid object', function() {
         const query = '{value: NumberLong(1)';
-        const parsed = parser.isFilterValid(query);
+        const parsed = parser.isFilterValid(query, { validate: false });
 
         it('returns false', function() {
           assert.equal(parsed, false);
