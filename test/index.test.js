@@ -236,6 +236,26 @@ describe('mongodb-query-parser', function() {
         assert.equal(parsed.value.toNumber(), 1);
       });
     });
+
+    context('when turning off validation', function() {
+      context('when the query is a valid object', function() {
+        const query = '{value: NumberLong(1)}';
+        const parsed = parser.isFilterValid(query);
+
+        it('returns truthy', function() {
+          assert.equal(parsed.value.toNumber(), 1);
+        });
+      });
+
+      context('when the query is not a valid object', function() {
+        const query = '{value: NumberLong(1)';
+        const parsed = parser.isFilterValid(query);
+
+        it('returns false', function() {
+          assert.equal(parsed, false);
+        });
+      });
+    });
   });
 
   describe('stringify', function() {
