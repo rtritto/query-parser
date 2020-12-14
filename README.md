@@ -1,4 +1,4 @@
-# mongodb-query-parser [![travis][travis_img]][travis_url] [![npm][npm_img]][npm_url]
+# mongodb-query-parser [![Check and Test][workflow_img]][workflow_url] [![npm][npm_img]][npm_url]
 
 > Safe parsing and validation for MongoDB queries (filters), projections, and more.
 
@@ -62,7 +62,7 @@ We have a [migration guide](MIGRATION.md) which covers what to look out for betw
 
 Apache 2.0
 
-[travis_img]: https://img.shields.io/travis/mongodb-js/query-parser.svg
-[travis_url]: https://travis-ci.org/mongodb-js/query-parser
+[workflow_img]: https://github.com/mongodb-js/query-parser/workflows/Check%20and%20Test/badge.svg?event=push
+[workflow_url]: https://github.com/mongodb-js/query-parser/actions?query=workflow%3A%22Check+and+Test%22
 [npm_img]: https://img.shields.io/npm/v/mongodb-query-parser.svg
 [npm_url]: https://npmjs.org/package/mongodb-query-parser
