@@ -383,10 +383,18 @@ describe('mongodb-query-parser', function() {
         comments: { $slice: -1 }
       });
     });
-    it('should detect invalid project strings', function() {
-      assert.equal(parser.isProjectValid('{_id: "a"}'), false);
-      assert.equal(parser.isProjectValid('{_id: "1"}'), false);
+    it('should allow any project strings', function() {
+      assert.deepEqual(parser.isProjectValid('{_id: "a"}'), {_id: 'a'});
+      assert.deepEqual(parser.isProjectValid('{_id: "1"}'), { _id: '1' });
+    });
+    it('should reject broken project strings', () => {
       assert.equal(parser.isProjectValid('{grabage'), false);
+    });
+    it('should reject non object project values', () => {
+      assert.equal(parser.isProjectValid('true'), false);
+      assert.equal(parser.isProjectValid('123'), false);
+      assert.equal(parser.isProjectValid('"something"'), false);
+      assert.equal(parser.isProjectValid('null'), false);
     });
   });
 
@@ -405,7 +413,7 @@ describe('mongodb-query-parser', function() {
         { locale: 'en_US', strength: 1 }
       );
     });
-    it('should detect invalid project strings', function() {
+    it('should detect invalid collation strings', function() {
       assert.equal(parser.isCollationValid('{invalid: "simple"}'), false);
       assert.equal(parser.isCollationValid('{locale: ""}'), false);
       assert.equal(parser.isCollationValid('{locale: "invalid"}'), false);
