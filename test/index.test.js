@@ -429,10 +429,27 @@ describe('mongodb-query-parser', function() {
     it('should work', function() {
       assert.deepEqual(parser.parseSort('{_id: 1}'), { _id: 1 });
       assert.deepEqual(parser.parseSort('{_id: -1}'), { _id: -1 });
-
+    });
+    it('should allow objects and arrays as values', () => {
+      assert.deepEqual(parser.isSortValid('{_id: 1}'), { _id: 1 });
+      assert.deepEqual(parser.isSortValid('{_id: -1}'), { _id: -1 });
+      assert.deepEqual(parser.isSortValid('{_id: "asc"}'), { _id: 'asc' });
+      assert.deepEqual(parser.isSortValid('{_id: "desc"}'), { _id: 'desc' });
+      assert.deepEqual(
+        parser.isSortValid('{ score: { $meta: "textScore" } }'),
+        { score: { $meta: 'textScore' } }
+      );
+      assert.deepEqual(parser.isSortValid('[["123", -1]]'), [['123', -1]]);
+      assert.deepEqual(parser.isSortValid('[["bar", 1]]'), [['bar', 1]]);
+    });
+    it('should reject unsupported sort values', () => {
       assert.equal(parser.isSortValid('{_id: "a"}'), false);
       assert.equal(parser.isSortValid('{_id: "1"}'), false);
       assert.equal(parser.isSortValid('{grabage'), false);
+      assert.equal(parser.isSortValid('[1]'), false);
+      assert.equal(parser.isSortValid('["foo"]'), false);
+      assert.equal(parser.isSortValid('[["foo", "bar"]]'), false);
+      assert.equal(parser.isSortValid('[[123, -1]]'), false);
     });
   });
 
