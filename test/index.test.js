@@ -368,6 +368,45 @@ describe('mongodb-query-parser', function() {
         );
       });
     });
+
+    context('when providing a DBRef with (collection, oid)', function() {
+      it('correctly converts to a DBRef', function() {
+        var res = parser.parseFilter(
+          "{dbref: DBRef('col', 1)}"
+        );
+        var stringified = parser.stringify(res);
+        assert.equal(
+          stringified,
+          "{dbref: DBRef('col', '1')}"
+        );
+      });
+    });
+
+    context('when providing a DBRef with (db.collection, oid)', function() {
+      it('correctly converts to a DBRef', function() {
+        var res = parser.parseFilter(
+          "{dbref: DBRef('db.col', 1)}"
+        );
+        var stringified = parser.stringify(res);
+        assert.equal(
+          stringified,
+          "{dbref: DBRef('col', '1', 'db')}"
+        );
+      });
+    });
+
+    context('when providing a DBRef with (collection, oid, db)', function() {
+      it('correctly converts to a DBRef', function() {
+        var res = parser.parseFilter(
+          "{dbref: DBRef('col', 1, 'db')}"
+        );
+        var stringified = parser.stringify(res);
+        assert.equal(
+          stringified,
+          "{dbref: DBRef('col', '1', 'db')}"
+        );
+      });
+    });
   });
 
   describe('project', function() {
