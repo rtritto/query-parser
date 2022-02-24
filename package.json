@@ -15,7 +15,7 @@
     "url": "https://github.com/mongodb-js/query-parser/issues"
   },
   "dependencies": {
-    "bson": "^4.0.3",
+    "bson": "^4.6.1",
     "debug": "^4.1.1",
     "ejson-shell-parser": "^1.1.1",
     "is-json": "^2.0.1",

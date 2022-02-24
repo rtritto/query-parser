@@ -325,6 +325,15 @@ describe('mongodb-query-parser', function() {
       });
     });
 
+    context('when providing an int32', function() {
+      it('correctly converts to Int32', function() {
+        const stringified = parser.stringify({
+          test: new bson.Int32(123)
+        });
+        assert.equal(stringified, "{test: NumberInt('123')}");
+      });
+    });
+
     context('when providing a geo query', function() {
       const query = {
         coordinates: {
