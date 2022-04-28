@@ -416,6 +416,30 @@ describe('mongodb-query-parser', function() {
         );
       });
     });
+
+    context('when provided a RegExp', function() {
+      it('correctly formats the options', function() {
+        var res = parser.parseFilter(
+          '{name: /foo/i}'
+        );
+        var stringified = parser.stringify(res);
+        assert.equal(
+          stringified,
+          "{name: RegExp(\"foo\", 'i')}"
+        );
+      });
+
+      it('escapes quotes', function() {
+        var res = parser.parseFilter(
+          '{name: /\'/}'
+        );
+        var stringified = parser.stringify(res);
+        assert.equal(
+          stringified,
+          "{name: RegExp(\"'\")}"
+        );
+      });
+    });
   });
 
   describe('project', function() {
