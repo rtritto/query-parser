@@ -3,13 +3,16 @@ var assert = require('assert');
 var sinon = require('sinon');
 
 const bson = require('bson');
-const EJSON = require('mongodb-extended-json');
+const LegacyEJSON = require('mongodb-extended-json');
 // const EJSON = require('bson').EJSON;
 var debug = require('debug')('mongodb-query-parser:test');
 
 function convert(string) {
   var res = parser.parseFilter(string);
-  var ret = JSON.parse(EJSON.stringify(res, { legacy: true }));
+  // TODO: Never use mongodb-extended-json, https://github.com/mongodb-js/query-parser/pull/122
+  var ret = res._bsontype === 'ObjectId' ?
+    bson.EJSON.serialize(res) :
+    JSON.parse(LegacyEJSON.stringify(res, { legacy: true }));
   debug('converted', { input: string, parsed: res, encoded: ret });
   return ret;
 }
