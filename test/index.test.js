@@ -3,16 +3,11 @@ var assert = require('assert');
 var sinon = require('sinon');
 
 const bson = require('bson');
-const LegacyEJSON = require('mongodb-extended-json');
-// const EJSON = require('bson').EJSON;
 var debug = require('debug')('mongodb-query-parser:test');
 
 function convert(string) {
   var res = parser.parseFilter(string);
-  // TODO: Never use mongodb-extended-json, https://github.com/mongodb-js/query-parser/pull/122
-  var ret = res._bsontype === 'ObjectId' ?
-    bson.EJSON.serialize(res) :
-    JSON.parse(LegacyEJSON.stringify(res, { legacy: true }));
+  var ret = bson.EJSON.serialize(res, { legacy: true, relaxed: false });
   debug('converted', { input: string, parsed: res, encoded: ret });
   return ret;
 }
@@ -50,35 +45,59 @@ describe('mongodb-query-parser', function() {
       });
 
       it('should support Date', function() {
+        assert.deepEqual(convert('Date("2017-01-01T12:35:31.123Z")'), {
+          $date: '2017-01-01T12:35:31.123Z'
+        });
+      });
+
+      it('should support Date (0 ms)', function() {
         assert.deepEqual(convert('Date("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31.000Z'
+          $date: '2017-01-01T12:35:31Z'
         });
       });
 
       it('should support new Date', function() {
+        assert.deepEqual(convert('new Date("2017-01-01T12:35:31.123Z")'), {
+          $date: '2017-01-01T12:35:31.123Z'
+        });
+      });
+
+      it('should support new Date (0 ms)', function() {
         assert.deepEqual(convert('new Date("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31.000Z'
+          $date: '2017-01-01T12:35:31Z'
         });
       });
 
       it('should support ISODate', function() {
+        assert.deepEqual(convert('ISODate("2017-01-01T12:35:31.123Z")'), {
+          $date: '2017-01-01T12:35:31.123Z'
+        });
+      });
+
+      it('should support ISODate (0 ms)', function() {
         assert.deepEqual(convert('ISODate("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31.000Z'
+          $date: '2017-01-01T12:35:31Z'
         });
       });
 
       it('should support new ISODate', function() {
+        assert.deepEqual(convert('new ISODate("2017-01-01T12:35:31.123Z")'), {
+          $date: '2017-01-01T12:35:31.123Z'
+        });
+      });
+
+      it('should support new ISODate (0 ms)', function() {
         assert.deepEqual(convert('new ISODate("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31.000Z'
+          $date: '2017-01-01T12:35:31Z'
         });
       });
 
       it('should support BinData', function() {
         assert.deepEqual(
-          convert('new BinData(2, "OyQRAeK7QlWMr0E2xWapYg==")'),
+          convert(`new BinData(${bson.Binary.SUBTYPE_BYTE_ARRAY}, "OyQRAeK7QlWMr0E2xWapYg==")`),
           {
             $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
-            $type: '2'
+            $type: `0${bson.Binary.SUBTYPE_BYTE_ARRAY}`
           }
         );
       });
@@ -88,7 +107,7 @@ describe('mongodb-query-parser', function() {
           convert('UUID("3b241101-e2bb-4255-8caf-4136c566a962")'),
           {
             $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
-            $type: '4'
+            $type: `0${bson.Binary.SUBTYPE_UUID}`
           }
         );
       });
@@ -164,13 +183,13 @@ describe('mongodb-query-parser', function() {
 
       it('should support Timestamp', function() {
         assert.deepEqual(convert('{t: Timestamp(0, 0)}'), {
-          t: { $timestamp: {} }
+          t: { $timestamp: { i: 0, t: 0 } }
         });
       });
 
       it('should support new Timestamp', function() {
         assert.deepEqual(convert('{t: new Timestamp(0, 0)}'), {
-          t: { $timestamp: {} }
+          t: { $timestamp: { i: 0, t: 0 } }
         });
       });
 
@@ -238,11 +257,15 @@ describe('mongodb-query-parser', function() {
       });
 
       it('should support NumberInt', function() {
-        assert.deepEqual(convert('NumberInt("1234567890")'), 1234567890);
+        assert.deepEqual(convert('NumberInt("1234567890")'), {
+          '$numberInt': '1234567890'
+        });
       });
 
       it('should support NumberInt with number', function() {
-        assert.deepEqual(convert('NumberInt(1234567890)'), 1234567890);
+        assert.deepEqual(convert('NumberInt(1234567890)'), {
+          '$numberInt': '1234567890'
+        });
       });
 
       it('should support NumberDecimal', function() {

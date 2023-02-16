@@ -33,12 +33,12 @@ parser.toJavascriptString(parse(query));
 ### Extended JSON Support
 
 ```javascript
+var bson = require('bson');
 var parser = require('mongodb-query-parser');
-var EJSON = require('mongodb-extended-json');
 var queryAsAnObjectWithTypes = parser.parseFilter(query);
 
 // Use extended json to prove types are intact
-EJSON.stringify(queryAsAnObjectWithTypes);
+bson.EJSON.stringify(queryAsAnObjectWithTypes);
 // >>> '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}'
 
 var queryAsJSON = '{"_id":{"$oid":"58c33a794d08b991e3648fd2"}}';

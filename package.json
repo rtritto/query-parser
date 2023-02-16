@@ -25,7 +25,6 @@
     "mongodb-language-model": "^1.6.1"
   },
   "devDependencies": {
-    "mongodb-extended-json": "^1.10.2",
     "eslint-config-mongodb-js": "^5.0.3",
     "mocha": "^7.0.0",
     "mongodb-js-precommit": "^2.0.0",
