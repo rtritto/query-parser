@@ -96,8 +96,10 @@ describe('mongodb-query-parser', function() {
         assert.deepEqual(
           convert(`new BinData(${bson.Binary.SUBTYPE_BYTE_ARRAY}, "OyQRAeK7QlWMr0E2xWapYg==")`),
           {
-            $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
-            $type: `0${bson.Binary.SUBTYPE_BYTE_ARRAY}`
+            $binary: {
+              base64: 'OyQRAeK7QlWMr0E2xWapYg==',
+              subType: `0${bson.Binary.SUBTYPE_BYTE_ARRAY}`
+            }
           }
         );
       });
@@ -106,8 +108,10 @@ describe('mongodb-query-parser', function() {
         assert.deepEqual(
           convert('UUID("3b241101-e2bb-4255-8caf-4136c566a962")'),
           {
-            $binary: 'OyQRAeK7QlWMr0E2xWapYg==',
-            $type: `0${bson.Binary.SUBTYPE_UUID}`
+            $binary: {
+              base64: 'OyQRAeK7QlWMr0E2xWapYg==',
+              subType: `0${bson.Binary.SUBTYPE_UUID}`
+            }
           }
         );
       });
@@ -195,22 +199,28 @@ describe('mongodb-query-parser', function() {
 
       it('should support inline regex', function() {
         assert.deepEqual(convert('/some.*regex+/i'), {
-          $regex: 'some.*regex+',
-          $options: 'i'
+          $regularExpression: {
+            options: 'i',
+            pattern: 'some.*regex+'
+          }
         });
       });
 
       it('should support RegExp', function() {
         assert.deepEqual(convert("RegExp('some.*regex+', 'i')"), {
-          $regex: 'some.*regex+',
-          $options: 'i'
+          $regularExpression: {
+            options: 'i',
+            pattern: 'some.*regex+'
+          }
         });
       });
 
       it('should support new RegExp', function() {
         assert.deepEqual(convert("new RegExp('some.*regex+', 'i')"), {
-          $regex: 'some.*regex+',
-          $options: 'i'
+          $regularExpression: {
+            options: 'i',
+            pattern: 'some.*regex+'
+          }
         });
       });
 
