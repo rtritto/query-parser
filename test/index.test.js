@@ -7,7 +7,7 @@ var debug = require('debug')('mongodb-query-parser:test');
 
 function convert(string) {
   var res = parser.parseFilter(string);
-  var ret = bson.EJSON.serialize(res, { legacy: true, relaxed: false });
+  var ret = bson.EJSON.serialize(res);
   debug('converted', { input: string, parsed: res, encoded: ret });
   return ret;
 }
