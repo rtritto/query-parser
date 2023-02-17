@@ -15,7 +15,6 @@
     "url": "https://github.com/mongodb-js/query-parser/issues"
   },
   "dependencies": {
-    "bson": "^4.6.1 || ^5.0.0",
     "debug": "^4.1.1",
     "ejson-shell-parser": "^1.2.1",
     "is-json": "^2.0.1",
@@ -29,6 +28,9 @@
     "mocha": "^7.0.0",
     "mongodb-js-precommit": "^2.0.0",
     "sinon": "^9.0.0"
+  },
+  "peerDependencies": {
+    "bson": "^4.6.1 || ^5"
   },
   "license": "Apache-2.0"
 }
