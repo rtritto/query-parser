@@ -360,6 +360,15 @@ describe('mongodb-query-parser', function() {
       });
     });
 
+    context('when providing a Double', function() {
+      it('correctly converts to Double', function() {
+        const stringified = parser.stringify({
+          test: new bson.Double(0.8)
+        });
+        assert.equal(stringified, "{test: Double('0.8')}");
+      });
+    });
+
     context('when providing a geo query', function() {
       const query = {
         coordinates: {
