@@ -56,7 +56,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.34.4",
+    "@microsoft/api-extractor": "^7.36.0",
     "@mongodb-js/eslint-config-devtools": "^0.9.4",
     "@mongodb-js/mocha-config-compass": "^1.2.0",
     "@mongodb-js/prettier-config-compass": "^1.0.0",

@@ -133,10 +133,11 @@ const BSON_TO_JS_STRING = {
   },
 };
 
+/** @public */
 export function toJSString(
   obj: Document,
   ind?: Parameters<typeof JSON.stringify>[2]
-) {
+): string | undefined {
   return toJavascriptString(
     obj,
     function (value, indent, stringify) {
@@ -151,7 +152,8 @@ export function toJSString(
   );
 }
 
-export function stringify(obj: Document) {
+/** @public */
+export function stringify(obj: Document): string | undefined {
   return toJSString(obj)
     ?.replace(/ ?\n ? ?/g, '')
     .replace(/ {2,}/g, ' ');

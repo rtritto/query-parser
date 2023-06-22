@@ -9,13 +9,21 @@ import { stringify, toJSString } from './stringify';
 
 const debug = _debug('mongodb-query-parser');
 
+/** @public */
 const DEFAULT_FILTER = {};
+/** @public */
 const DEFAULT_SORT = null;
+/** @public */
 const DEFAULT_LIMIT = 0;
+/** @public */
 const DEFAULT_SKIP = 0;
+/** @public */
 const DEFAULT_PROJECT = null;
+/** @public */
 const DEFAULT_COLLATION = null;
+/** @public */
 const DEFAULT_MAX_TIME_MS = 60000; // 1 minute in ms
+/** @public */
 const QUERY_PROPERTIES = ['filter', 'project', 'sort', 'skip', 'limit'];
 
 function isEmpty(input: string | number | null | undefined): boolean {
@@ -45,6 +53,7 @@ function _parseCollation(input: string) {
   return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
+/** @public */
 export function parseSort(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_SORT;
@@ -56,6 +65,7 @@ function _parseFilter(input: string) {
   return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
+/** @public */
 export function parseFilter(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_FILTER;
@@ -63,6 +73,7 @@ export function parseFilter(input: string) {
   return _parseFilter(input);
 }
 
+/** @public */
 export function parseCollation(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_COLLATION;
@@ -73,6 +84,7 @@ export function parseCollation(input: string) {
 /**
  * Validation function for a query `filter`. Must be a valid MongoDB query
  * according to the query language.
+ * @public
  *
  * @return {Boolean|Object} false if not valid, or the parsed filter.
  */
@@ -90,6 +102,7 @@ export function isFilterValid(input: string) {
 
 /**
  * Validation of collation object keys and values.
+ * @public
  *
  * @param {Object} collation
  * @return {Boolean|Object} false if not valid, otherwise the parsed project.
@@ -114,6 +127,7 @@ function _isCollationValid(collation: Document) {
 
 /**
  * Validation function for a query `collation`.
+ * @public
  *
  * @return {Boolean|Object} false if not valid, or the parsed filter.
  */
@@ -142,6 +156,7 @@ function isValueOkForProject() {
   return true;
 }
 
+/** @public */
 export function parseProject(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_PROJECT;
@@ -151,6 +166,7 @@ export function parseProject(input: string) {
 
 /**
  * Validation function for a query `project`. Must only have 0 or 1 as values.
+ * @public
  *
  * @return {Boolean|Object} false if not valid, otherwise the parsed project.
  */
@@ -199,6 +215,7 @@ function isValueOkForSortArray(val: any): boolean {
 
 /**
  * Validation function for a query `sort`. Must only have -1 or 1 as values.
+ * @public
  *
  * @return {Boolean|Object} false if not valid, otherwise the cleaned-up sort.
  */
@@ -232,6 +249,7 @@ export function isSortValid(input: string) {
 
 /**
  * Validation function for a query `maxTimeMS`. Must be digits only.
+ * @public
  *
  * Returns false if not valid, otherwise the cleaned-up max time ms.
  */
@@ -244,6 +262,7 @@ export function isMaxTimeMSValid(input: string | number): number | false {
 
 /**
  * Validation function for a query `skip`. Must be digits only.
+ * @public
  *
  * Returns false if not valid, otherwise the cleaned-up skip.
  */
@@ -256,6 +275,7 @@ export function isSkipValid(input: string | number): number | false {
 
 /**
  * Validation function for a query `limit`. Must be digits only.
+ * @public
  *
  * Returns false if not valid, otherwise the cleaned-up limit.
  */
@@ -276,6 +296,7 @@ const validatorFunctions = {
   isNumberValid,
 };
 
+/** @public */
 export function validate(what: string, input: string) {
   const validator =
     validatorFunctions[
@@ -288,7 +309,8 @@ export function validate(what: string, input: string) {
   return validator(input);
 }
 
-export default function (
+/** @public */
+export default function queryParser(
   filter: any,
   project: string | null = DEFAULT_PROJECT
 ) {
