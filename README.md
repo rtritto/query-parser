@@ -54,7 +54,6 @@ We have a [migration guide](MIGRATION.md) which covers what to look out for betw
 
 ## Related
 
-- [`mongodb-language-model`](https://github.com/mongodb-js/mongodb-language-model) Work with rich AST's of MongoDB queries
 - [`mongodb-stage-validator`](https://github.com/mongodb-js/stage-validator) Parse and validate MongoDB Aggregation Pipeline stages.
 - [`@mongodb-js/compass-query-bar`](https://github.com/mongodb-js/compass-query-bar) Compass UI Plugin that uses `mongodb-query-parser` for validation.
 

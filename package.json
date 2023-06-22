@@ -2,35 +2,82 @@
   "name": "mongodb-query-parser",
   "description": "Parse MongoDB queries",
   "version": "2.5.0",
-  "scripts": {
-    "check": "mongodb-js-precommit",
-    "test": "mocha"
+  "author": {
+    "name": "MongoDB Inc",
+    "email": "compass@mongodb.com"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "homepage": "https://github.com/mongodb-js/query-parser",
+  "bugs": {
+    "url": "https://jira.mongodb.org/projects/COMPASS/issuess",
+    "email": "compass@mongodb.com"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/mongodb-js/query-parser.git"
   },
-  "bugs": {
-    "url": "https://github.com/mongodb-js/query-parser/issues"
+  "files": [
+    "dist",
+    "index.d.ts",
+    "README.md"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/.esm-wrapper.mjs"
+  },
+  "engines": {
+    "node": ">= 16.17.0"
+  },
+  "types": "./index.d.ts",
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsc -p tsconfig.json && api-extractor run && rimraf 'dist/**/*.d.ts*' && gen-esm-wrapper . ./dist/.esm-wrapper.mjs",
+    "typecheck": "tsc -p tsconfig-lint.json --noEmit",
+    "eslint": "eslint",
+    "prettier": "prettier",
+    "lint": "npm run eslint . && npm run prettier -- --check .",
+    "depcheck": "depcheck",
+    "check": "npm run typecheck && npm run lint && npm run depcheck",
+    "check-ci": "npm run check",
+    "test": "xvfb-maybe --auto-servernum -- mocha",
+    "test-cov": "nyc -x \"**/*.spec.*\" --reporter=lcov --reporter=text --reporter=html npm run test",
+    "test-watch": "npm run test -- --watch",
+    "test-ci": "npm run test-cov",
+    "reformat": "npm run prettier -- --write . && npm run eslint . -- --fix"
   },
   "dependencies": {
-    "debug": "^4.1.1",
+    "debug": "^4.2.0",
     "ejson-shell-parser": "^1.2.1",
-    "is-json": "^2.0.1",
     "javascript-stringify": "^2.0.1",
-    "lodash": "^4.17.15",
-    "lru-cache": "^5.1.1",
-    "mongodb-language-model": "^1.6.1"
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "eslint-config-mongodb-js": "^5.0.3",
-    "mocha": "^7.0.0",
-    "mongodb-js-precommit": "^2.0.0",
-    "sinon": "^9.0.0"
+    "@microsoft/api-extractor": "^7.34.4",
+    "@mongodb-js/eslint-config-devtools": "^0.9.4",
+    "@mongodb-js/mocha-config-compass": "^1.2.0",
+    "@mongodb-js/prettier-config-compass": "^1.0.0",
+    "@mongodb-js/tsconfig-compass": "^1.0.1",
+    "@types/debug": "^4.1.8",
+    "@types/lodash": "^4.14.195",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^18.13.0",
+    "@types/sinon": "^10.0.15",
+    "depcheck": "^1.4.1",
+    "eslint": "^7.32.0",
+    "gen-esm-wrapper": "^1.1.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.8.8",
+    "rimraf": "^5.0.0",
+    "sinon": "^15.0.3",
+    "typescript": "^5.0.4",
+    "xvfb-maybe": "^0.2.1"
   },
   "peerDependencies": {
-    "bson": "^4.6.1 || ^5"
-  },
-  "license": "Apache-2.0"
+    "bson": "^5"
+  }
 }

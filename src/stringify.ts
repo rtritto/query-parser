@@ -1,7 +1,20 @@
 /**
  * TODO: lucas: this is now used in several modules (import-export, query-parser, probably others). Refactor into 1 shared place. bson?
  */
-const toJavascriptString = require('javascript-stringify').stringify;
+import type {
+  Binary,
+  BSONValue,
+  Code,
+  DBRef,
+  Decimal128,
+  Document,
+  Double,
+  Int32,
+  Long,
+  ObjectId,
+  Timestamp,
+} from 'bson';
+import { stringify as toJavascriptString } from 'javascript-stringify';
 
 /**
  * [`Object.prototype.toString.call(value)`, `string type name`]
@@ -17,78 +30,89 @@ const TYPE_FOR_TO_STRING = new Map([
   ['[object RegExp]', 'RegExp'],
   ['[object Boolean]', 'Boolean'],
   ['[object Null]', 'Null'],
-  ['[object Undefined]', 'Undefined']
+  ['[object Undefined]', 'Undefined'],
 ]);
 
-function detectType(value) {
+function detectType(value: BSONValue) {
   return TYPE_FOR_TO_STRING.get(Object.prototype.toString.call(value));
 }
 
-function getTypeDescriptorForValue(value) {
+function getTypeDescriptorForValue(value: BSONValue) {
   const t = detectType(value);
   const _bsontype = t === 'Object' && value._bsontype;
   return {
     type: _bsontype || t,
-    isBSON: !!_bsontype
+    isBSON: !!_bsontype,
   };
 }
 
 const BSON_TO_JS_STRING = {
-  Code: function(v) {
+  Code: function (v: Code) {
     if (v.scope) {
       return `Code('${v.code}',${JSON.stringify(v.scope)})`;
     }
     return `Code('${v.code}')`;
   },
-  ObjectID: function(v) {
+  ObjectID: function (v: ObjectId) {
     return `ObjectId('${v.toString('hex')}')`;
   },
-  ObjectId: function(v) {
+  ObjectId: function (v: ObjectId) {
     return `ObjectId('${v.toString('hex')}')`;
   },
-  Binary: function(v) {
+  Binary: function (v: Binary) {
     const subType = v.sub_type;
     if (subType === 4 && v.buffer.length === 16) {
-      const uuidHex = v.buffer.toString('hex');
-      return `UUID("${uuidHex.slice(0, 8)}-${uuidHex.slice(8, 12)}-${uuidHex.slice(12, 16)}-${uuidHex.slice(16, 20)}-${uuidHex.slice(20, 32)}")`;
+      let uuidHex = '';
+      try {
+        // Try to get the pretty hex version of the UUID
+        uuidHex = v.toUUID().toString();
+      } catch {
+        // If uuid is not following the uuid format converting it to UUID will
+        // fail, we don't want the UI to fail rendering it and instead will
+        // just display "unformatted" hex value of the binary whatever it is
+        uuidHex = v.toString('hex');
+      }
+      return `UUID('${uuidHex}')`;
     }
-    return `BinData(${subType.toString(16)}, '${v.buffer.toString('base64')}')`;
+    // The `Binary.buffer.toString` type says it doesn't accept
+    // arguments. However it does, and a test will fail without it.
+    return `BinData(${subType.toString(16)}, '${v.toString('base64')}')`;
   },
-  DBRef: function(v) {
+  DBRef: function (v: DBRef) {
     if (v.db) {
-      return `DBRef('${v.collection}', '${v.oid}', '${v.db}')`;
+      return `DBRef('${v.collection}', '${v.oid.toString()}', '${v.db}')`;
     }
 
-    return `DBRef('${v.collection}', '${v.oid}')`;
+    return `DBRef('${v.collection}', '${v.oid.toString()}')`;
   },
-  Timestamp: function(v) {
+  Timestamp: function (v: Timestamp) {
     return `Timestamp({ t: ${v.high}, i: ${v.low} })`;
   },
-  Long: function(v) {
+  Long: function (v: Long) {
     return `NumberLong(${v.toString()})`;
   },
-  Decimal128: function(v) {
+  Decimal128: function (v: Decimal128) {
     return `NumberDecimal('${v.toString()}')`;
   },
-  Double: function(v) {
+  Double: function (v: Double) {
     return `Double('${v.toString()}')`;
   },
-  Int32: function(v) {
+  Int32: function (v: Int32) {
     return `NumberInt('${v.toString()}')`;
   },
-  MaxKey: function() {
+  MaxKey: function () {
     return 'MaxKey()';
   },
-  MinKey: function() {
+  MinKey: function () {
     return 'MinKey()';
   },
-  Date: function(v) {
+  Date: function (v: Date) {
     return `ISODate('${v.toISOString()}')`;
   },
-  ISODate: function(v) {
+  ISODate: function (v: Date) {
     return `ISODate('${v.toISOString()}')`;
   },
-  RegExp: function(v) {
+  RegExp: function (v: RegExp) {
     let o = '';
     let hasOptions = false;
 
@@ -106,15 +130,18 @@ const BSON_TO_JS_STRING = {
     }
 
     return `RegExp(${JSON.stringify(v.source)}${hasOptions ? `, '${o}'` : ''})`;
-  }
+  },
 };
 
-function toJSString(obj, ind) {
+export function toJSString(
+  obj: Document,
+  ind?: Parameters<typeof JSON.stringify>[2]
+) {
   return toJavascriptString(
     obj,
-    function(value, indent, stringify) {
+    function (value, indent, stringify) {
       const t = getTypeDescriptorForValue(value);
-      const toJs = BSON_TO_JS_STRING[t.type];
+      const toJs = BSON_TO_JS_STRING[t.type as keyof typeof BSON_TO_JS_STRING];
       if (!toJs) {
         return stringify(value);
       }
@@ -124,10 +151,8 @@ function toJSString(obj, ind) {
   );
 }
 
-module.exports.toJSString = toJSString;
-
-module.exports.stringify = function(obj) {
+export function stringify(obj: Document) {
   return toJSString(obj)
-    .replace(/ ?\n ? ?/g, '')
+    ?.replace(/ ?\n ? ?/g, '')
     .replace(/ {2,}/g, ' ');
-};
+}

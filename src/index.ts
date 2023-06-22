@@ -1,12 +1,13 @@
-'use strict';
+import type { Document } from 'bson';
+import parseShellStringToEJSON, { ParseMode } from 'ejson-shell-parser';
 
-const { EJSON } = require('bson');
-const stringify = require('./stringify');
-const { default: ejsonParse } = require('ejson-shell-parser');
-const _ = require('lodash');
-const queryLanguage = require('mongodb-language-model');
-const debug = require('debug')('mongodb-query-parser');
-const { COLLATION_OPTIONS } = require('./constants');
+import _ from 'lodash';
+import _debug from 'debug';
+
+import { COLLATION_OPTIONS } from './constants';
+import { stringify, toJSString } from './stringify';
+
+const debug = _debug('mongodb-query-parser');
 
 const DEFAULT_FILTER = {};
 const DEFAULT_SORT = null;
@@ -17,91 +18,75 @@ const DEFAULT_COLLATION = null;
 const DEFAULT_MAX_TIME_MS = 60000; // 1 minute in ms
 const QUERY_PROPERTIES = ['filter', 'project', 'sort', 'skip', 'limit'];
 
-function isEmpty(input) {
-  const s = _.trim(input);
+function isEmpty(input: string | number | null | undefined): boolean {
+  if (input === null || input === undefined) {
+    return true;
+  }
+  const s = _.trim(typeof input === 'number' ? `${input}` : input);
+
   if (s === '{}') {
     return true;
   }
   return _.isEmpty(s);
 }
 
-function isNumberValid(input) {
+function isNumberValid(input: string | number) {
   if (isEmpty(input)) {
     return 0;
   }
-  return /^\d+$/.test(input) ? parseInt(input, 10) : false;
+  return /^\d+$/.test(`${input}`) ? parseInt(`${input}`, 10) : false;
 }
 
-function parseProject(input) {
-  return ejsonParse(input, { mode: 'loose' });
+function _parseProject(input: string) {
+  return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
-function parseCollation(input) {
-  return ejsonParse(input, { mode: 'loose' });
+function _parseCollation(input: string) {
+  return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
-function parseSort(input) {
+export function parseSort(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_SORT;
   }
-  return ejsonParse(input, { mode: 'loose' });
+  return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
-function parseFilter(input) {
-  return ejsonParse(input, { mode: 'loose' });
+function _parseFilter(input: string) {
+  return parseShellStringToEJSON(input, { mode: ParseMode.Loose });
 }
 
-module.exports = function(filter, project = DEFAULT_PROJECT) {
-  if (arguments.length === 1) {
-    if (_.isString(filter)) {
-      return parseFilter(filter);
-    }
-  }
-  return {
-    filter: parseFilter(filter),
-    project: parseProject(project)
-  };
-};
-
-module.exports.parseFilter = function(input) {
+export function parseFilter(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_FILTER;
   }
-  return parseFilter(input);
-};
+  return _parseFilter(input);
+}
 
-module.exports.parseCollation = function(input) {
+export function parseCollation(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_COLLATION;
   }
-  return parseCollation(input);
-};
+  return _parseCollation(input);
+}
 
 /**
  * Validation function for a query `filter`. Must be a valid MongoDB query
  * according to the query language.
  *
- * @param {String} input
- * @param {{ validate: boolean }} [options]
  * @return {Boolean|Object} false if not valid, or the parsed filter.
  */
-module.exports.isFilterValid = (input, options = {}) => {
+export function isFilterValid(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_FILTER;
   }
   try {
-    const parsed = parseFilter(input);
-    if (options.validate === false) return parsed;
-    // is it a valid MongoDB query according to the language?
-    return queryLanguage.accepts(EJSON.stringify(parsed, {
-      legacy: true,
-      relaxed: false
-    })) ? parsed : false;
+    return _parseFilter(input);
   } catch (e) {
     debug('Filter "%s" is invalid', input, e);
     return false;
   }
-};
+}
 
 /**
  * Validation of collation object keys and values.
@@ -109,40 +94,41 @@ module.exports.isFilterValid = (input, options = {}) => {
  * @param {Object} collation
  * @return {Boolean|Object} false if not valid, otherwise the parsed project.
  */
-function isCollationValid(collation) {
-  let isValid = true;
-  _.forIn(collation, function(value, key) {
-    const itemIndex = _.findIndex(COLLATION_OPTIONS, key);
-    if (itemIndex === -1) {
+function _isCollationValid(collation: Document) {
+  for (const [key, value] of Object.entries(collation)) {
+    if (!COLLATION_OPTIONS[key]) {
       debug('Collation "%s" is invalid bc of its keys', collation);
-      isValid = false;
+      return false;
     }
-    if (COLLATION_OPTIONS[itemIndex][key].includes(value) === false) {
+    if (
+      COLLATION_OPTIONS[key as keyof typeof COLLATION_OPTIONS].includes(
+        value
+      ) === false
+    ) {
       debug('Collation "%s" is invalid bc of its values', collation);
-      isValid = false;
+      return false;
     }
-  });
-  return isValid ? collation : false;
+  }
+  return collation;
 }
 
 /**
  * Validation function for a query `collation`.
  *
- * @param {String} input
  * @return {Boolean|Object} false if not valid, or the parsed filter.
  */
-module.exports.isCollationValid = function(input) {
+export function isCollationValid(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_COLLATION;
   }
   try {
-    const parsed = parseCollation(input);
-    return isCollationValid(parsed);
+    const parsed = _parseCollation(input);
+    return _isCollationValid(parsed);
   } catch (e) {
     debug('Collation "%s" is invalid', input, e);
     return false;
   }
-};
+}
 
 function isValueOkForProject() {
   /**
@@ -156,26 +142,25 @@ function isValueOkForProject() {
   return true;
 }
 
-module.exports.parseProject = function(input) {
+export function parseProject(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_PROJECT;
   }
-  return parseProject(input);
-};
+  return _parseProject(input);
+}
 
 /**
  * Validation function for a query `project`. Must only have 0 or 1 as values.
  *
- * @param {String} input
  * @return {Boolean|Object} false if not valid, otherwise the parsed project.
  */
-module.exports.isProjectValid = function(input) {
+export function isProjectValid(input: string) {
   if (isEmpty(input)) {
     return DEFAULT_PROJECT;
   }
 
   try {
-    const parsed = parseProject(input);
+    const parsed = _parseProject(input);
 
     if (!_.isObject(parsed)) {
       debug('Project "%s" is invalid. Only documents are allowed', input);
@@ -192,15 +177,18 @@ module.exports.isProjectValid = function(input) {
     debug('Project "%s" is invalid', input, e);
     return false;
   }
-};
+}
 
 const ALLOWED_SORT_VALUES = [1, -1, 'asc', 'desc'];
 
-function isValueOkForSortDocument(val) {
-  return _.includes(ALLOWED_SORT_VALUES, val) || (_.isObject(val) && val.$meta);
+function isValueOkForSortDocument(val: any): boolean {
+  return (
+    _.includes(ALLOWED_SORT_VALUES, val) ||
+    !!(_.isObject(val) && (val as { $meta: string }).$meta)
+  );
 }
 
-function isValueOkForSortArray(val) {
+function isValueOkForSortArray(val: any): boolean {
   return (
     _.isArray(val) &&
     val.length === 2 &&
@@ -209,17 +197,12 @@ function isValueOkForSortArray(val) {
   );
 }
 
-module.exports.parseSort = function(input) {
-  return parseSort(input);
-};
-
 /**
- * validation function for a query `sort`. Must only have -1 or 1 as values.
+ * Validation function for a query `sort`. Must only have -1 or 1 as values.
  *
- * @param {String} input
  * @return {Boolean|Object} false if not valid, otherwise the cleaned-up sort.
  */
-module.exports.isSortValid = function(input) {
+export function isSortValid(input: string) {
   try {
     const parsed = parseSort(input);
 
@@ -245,64 +228,90 @@ module.exports.isSortValid = function(input) {
     debug('Sort "%s" is invalid', input, e);
     return false;
   }
-};
+}
 
 /**
  * Validation function for a query `maxTimeMS`. Must be digits only.
  *
- * @param {String} input
- * @return {Boolean|Number} false if not valid, otherwise the cleaned-up skip.
+ * Returns false if not valid, otherwise the cleaned-up max time ms.
  */
-module.exports.isMaxTimeMSValid = function(input) {
+export function isMaxTimeMSValid(input: string | number): number | false {
   if (isEmpty(input)) {
     return DEFAULT_MAX_TIME_MS;
   }
   return isNumberValid(input);
-};
+}
 
 /**
  * Validation function for a query `skip`. Must be digits only.
  *
- * @param {String} input
- * @return {Boolean|Number} false if not valid, otherwise the cleaned-up skip.
+ * Returns false if not valid, otherwise the cleaned-up skip.
  */
-module.exports.isSkipValid = function(input) {
+export function isSkipValid(input: string | number): number | false {
   if (isEmpty(input)) {
     return DEFAULT_SKIP;
   }
   return isNumberValid(input);
-};
+}
 
 /**
  * Validation function for a query `limit`. Must be digits only.
  *
- * @param {String} input
- * @return {Boolean|Number} false if not valid, otherwise the cleaned-up limit.
+ * Returns false if not valid, otherwise the cleaned-up limit.
  */
-module.exports.isLimitValid = function(input) {
+export function isLimitValid(input: string | number): number | false {
   if (isEmpty(input)) {
     return DEFAULT_LIMIT;
   }
   return isNumberValid(input);
+}
+
+const validatorFunctions = {
+  isMaxTimeMSValid,
+  isFilterValid,
+  isProjectValid,
+  isLimitValid,
+  isSkipValid,
+  isCollationValid,
+  isNumberValid,
 };
 
-module.exports.validate = (what, input, options = {}) => {
-  const validator = module.exports[`is${_.upperFirst(what)}Valid`];
+export function validate(what: string, input: string) {
+  const validator =
+    validatorFunctions[
+      `is${_.upperFirst(what)}Valid` as keyof typeof validatorFunctions
+    ];
   if (!validator) {
     debug('Do not know how to validate `%s`. Returning false.', what);
     return false;
   }
-  return validator(input, options);
+  return validator(input);
+}
+
+export default function (
+  filter: any,
+  project: string | null = DEFAULT_PROJECT
+) {
+  if (arguments.length === 1) {
+    if (_.isString(filter)) {
+      return _parseFilter(filter);
+    }
+  }
+  return {
+    filter: _parseFilter(filter),
+    project: project !== DEFAULT_PROJECT ? _parseProject(project) : project,
+  };
+}
+
+export {
+  stringify,
+  toJSString,
+  QUERY_PROPERTIES,
+  DEFAULT_FILTER,
+  DEFAULT_SORT,
+  DEFAULT_LIMIT,
+  DEFAULT_SKIP,
+  DEFAULT_PROJECT,
+  DEFAULT_COLLATION,
+  DEFAULT_MAX_TIME_MS,
 };
-
-module.exports.toJSString = stringify.toJSString;
-module.exports.stringify = stringify.stringify;
-
-module.exports.QUERY_PROPERTIES = QUERY_PROPERTIES;
-module.exports.DEFAULT_FILTER = DEFAULT_FILTER;
-module.exports.DEFAULT_SORT = DEFAULT_SORT;
-module.exports.DEFAULT_LIMIT = DEFAULT_LIMIT;
-module.exports.DEFAULT_SKIP = DEFAULT_SKIP;
-module.exports.DEFAULT_PROJECT = DEFAULT_PROJECT;
-module.exports.DEFAULT_COLLATION = DEFAULT_COLLATION;
-module.exports.DEFAULT_MAX_TIME_MS = DEFAULT_MAX_TIME_MS;

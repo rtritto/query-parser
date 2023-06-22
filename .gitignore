@@ -1,5 +1,9 @@
-.DS_Store
-node_modules/
-npm-debug.log
-.env
-*.swp
+.nyc_output
+node_modules
+package-lock.json
+dist
+coverage
+.esm-wrapper.mjs
+lib/
+.deps
+index.d.ts
