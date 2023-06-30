@@ -7,7 +7,6 @@ import type {
   Code,
   DBRef,
   Decimal128,
-  Document,
   Double,
   Int32,
   Long,
@@ -135,7 +134,7 @@ const BSON_TO_JS_STRING = {
 
 /** @public */
 export function toJSString(
-  obj: Document,
+  obj: unknown,
   ind?: Parameters<typeof JSON.stringify>[2]
 ): string | undefined {
   return toJavascriptString(
@@ -153,7 +152,7 @@ export function toJSString(
 }
 
 /** @public */
-export function stringify(obj: Document): string | undefined {
+export function stringify(obj: unknown): string | undefined {
   return toJSString(obj)
     ?.replace(/ ?\n ? ?/g, '')
     .replace(/ {2,}/g, ' ');

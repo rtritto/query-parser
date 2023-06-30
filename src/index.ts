@@ -310,7 +310,7 @@ export function validate(what: string, input: string) {
 
 /** @public */
 export default function queryParser(
-  filter: any,
+  filter: string,
   project: string | null = DEFAULT_PROJECT
 ) {
   if (arguments.length === 1) {
