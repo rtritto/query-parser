@@ -1,4 +1,3 @@
-import type { Document } from 'bson';
 import parseShellStringToEJSON, { ParseMode } from 'ejson-shell-parser';
 
 import _ from 'lodash';
@@ -107,7 +106,7 @@ export function isFilterValid(input: string) {
  * @param {Object} collation
  * @return {Boolean|Object} false if not valid, otherwise the parsed project.
  */
-function _isCollationValid(collation: Document) {
+function _isCollationValid(collation: any) {
   for (const [key, value] of Object.entries(collation)) {
     if (!COLLATION_OPTIONS[key]) {
       debug('Collation "%s" is invalid bc of its keys', collation);
@@ -115,7 +114,7 @@ function _isCollationValid(collation: Document) {
     }
     if (
       COLLATION_OPTIONS[key as keyof typeof COLLATION_OPTIONS].includes(
-        value
+        value as string | number | boolean
       ) === false
     ) {
       debug('Collation "%s" is invalid bc of its values', collation);
