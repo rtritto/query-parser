@@ -289,6 +289,7 @@ const validatorFunctions = {
   isMaxTimeMSValid,
   isFilterValid,
   isProjectValid,
+  isSortValid,
   isLimitValid,
   isSkipValid,
   isCollationValid,

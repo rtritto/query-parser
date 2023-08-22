@@ -19,6 +19,7 @@ import {
   DEFAULT_LIMIT,
   DEFAULT_MAX_TIME_MS,
   DEFAULT_SKIP,
+  validate,
 } from './index';
 
 const debug = _debug('mongodb-query-parser:test');
@@ -552,6 +553,7 @@ describe('mongodb-query-parser', function () {
       assert.deepEqual(parseSort('{_id: -1}'), { _id: -1 });
     });
     it('should allow objects and arrays as values', function () {
+      assert.deepEqual(isSortValid(''), null);
       assert.deepEqual(isSortValid('{_id: 1}'), { _id: 1 });
       assert.deepEqual(isSortValid('{_id: -1}'), { _id: -1 });
       assert.deepEqual(isSortValid('{_id: "asc"}'), { _id: 'asc' });
@@ -602,6 +604,16 @@ describe('mongodb-query-parser', function () {
       assert.equal(isMaxTimeMSValid('0'), 0);
       assert.equal(isMaxTimeMSValid(1), 1);
       assert.equal(isMaxTimeMSValid('   '), DEFAULT_MAX_TIME_MS);
+    });
+  });
+
+  describe('validate', function () {
+    it('calls the other validation functions', function () {
+      assert.deepEqual(isSortValid(''), null);
+      assert.deepEqual(validate('sort', ''), null);
+      assert.deepEqual(validate('Sort', ''), null);
+      assert.deepEqual(validate('sort', '[["123", -1]]'), [['123', -1]]);
+      assert.deepEqual(validate('limit', '   '), DEFAULT_LIMIT);
     });
   });
 });
