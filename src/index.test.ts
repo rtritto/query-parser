@@ -61,18 +61,6 @@ describe('mongodb-query-parser', function () {
         });
       });
 
-      it('should support Date', function () {
-        assert.deepEqual(convert('Date("2017-01-01T12:35:31.123Z")'), {
-          $date: '2017-01-01T12:35:31.123Z',
-        });
-      });
-
-      it('should support Date (0 ms)', function () {
-        assert.deepEqual(convert('Date("2017-01-01T12:35:31.000Z")'), {
-          $date: '2017-01-01T12:35:31Z',
-        });
-      });
-
       it('should support new Date', function () {
         assert.deepEqual(convert('new Date("2017-01-01T12:35:31.123Z")'), {
           $date: '2017-01-01T12:35:31.123Z',
@@ -179,12 +167,6 @@ describe('mongodb-query-parser', function () {
 
         afterEach(function () {
           clock.restore();
-        });
-
-        it('should support Date', function () {
-          assert.deepEqual(convert('{d: Date()}'), {
-            d: { $date: nowStr },
-          });
         });
 
         it('should support new Date', function () {
@@ -409,7 +391,7 @@ describe('mongodb-query-parser', function () {
 
     context('when providing a Date', function () {
       it('correctly converts to an ISODate', function () {
-        const res = parseFilter("{test: Date('2017-01-01T12:35:31.000Z')}");
+        const res = parseFilter("{test: new Date('2017-01-01T12:35:31.000Z')}");
         const stringified = stringify(res);
         assert.equal(
           stringified,
